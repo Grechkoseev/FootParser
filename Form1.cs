@@ -89,6 +89,8 @@ public partial class FootParserForm : Form
         Cursor = Cursors.WaitCursor;
         _entityList = await playersParser.GetEntityListTask();
         var players = _entityList.OfType<Player>().ToList();
+        var updatedStatsRecords = 0;
+        var updatedPlayersRecords = 0;
 
         var playerStats = new List<PlayerStat>(players.Count);
         playerStats.AddRange(players.Select(player => new PlayerStat
@@ -112,6 +114,7 @@ public partial class FootParserForm : Form
                      o.Firstname == obj.Firstname && o.Middlename == obj.Middlename && o.Lastname == obj.Lastname)))
         {
             context.Players.Add(obj);
+            updatedPlayersRecords++;
         }
 
         var playersInDb = context.Players.ToList();
@@ -139,6 +142,7 @@ public partial class FootParserForm : Form
                     existingPlayerStat.ManOfTheMatch = playerStat.ManOfTheMatch;
 
                     context.PlayerStats.Update(existingPlayerStat);
+                    updatedStatsRecords++;
                 }
                 else
                 {
@@ -150,7 +154,7 @@ public partial class FootParserForm : Form
         await context.SaveChangesAsync();
         Cursor = Cursors.Default;
 
-        MessageBox.Show(context.PlayerStats.Count().ToString());
+        MessageBox.Show($"Обновлено {updatedStatsRecords} записей в таблице со статистикой\nОбновлено {updatedPlayersRecords} записей в таблице с ФИО игроков");
     }
 
     private async void ParseCoachesButton_Click(object sender, EventArgs e)
